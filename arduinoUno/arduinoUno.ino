@@ -2,7 +2,8 @@
 #include<dht.h>
 #include<ArduinoJson.h>
 #include<SoftwareSerial.h>
-SoftwareSerial s(5,6);//Establishing recive and transmittion ports Rx and Tx
+SoftwareSerial s(5,6);
+SoftwareSerial d(5,6);//Establishing recive and transmittion ports Rx and Tx
 LiquidCrystal myLCD(12,11,5,4,3,2);//Establishing connection to lcd
 dht DHT;
 int dhtPin=3;//Humidity and temperature port
@@ -28,7 +29,12 @@ void loop()
   mq135Value=analogRead(mq135Pin);
   soilMoistureValue=analogRead(soilMoisturePin);
   StaticJsonBuffer<1000> jsonBuffer;
+  StaticJsonBuffer<1000> jsonBuffer1;
   JsonObject& root= jsonBuffer.createObject();
+  JsonObject& root1=jsonBuffer1.parseObject(d);
+  root.prettyPrintTo(Serial); 
+  if(root1 == JsonObject::invalid())
+    return; 
   root["Humidity"] =DHT.humidity;
   root["Temperature"] =DHT.temperature;
   root["soilMoisture"]=soilMoistureValue;

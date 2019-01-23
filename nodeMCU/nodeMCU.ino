@@ -9,27 +9,34 @@
 ESP8266WiFiMulti wifiMulti;
 ESP8266WebServer server(80);//Server port for communication
 SoftwareSerial s(D6,D5);//Establishing recive and transmittion ports Rx and Tx
+SoftwareSerial d(D5,D6);
+int motorStatus=0;
 int dhtHumidityValue;
 int dhtTemperatureValue;
 int soilMoistureValue;
 int mq4Value;
 int mq135Value;
+int led=D5;
 const char* ssid="AtmegaEvolution";
 const char* password="12345678";
 String getContentType(String filename);
 void handleFileRead();
 void handleNotFound();
-void handleLED();
+void onMotor();
 void runFan();
 void runPump();
+StaticJsonBuffer<1000> jsonBuffer1;
+JsonObject& root1=jsonBuffer1.createObject();
+  
 void setup()
 {
+  pinMode(led,OUTPUT);
  Serial.begin(115200);
  s.begin(115200);//Baut rate for communication of nodeMCU and arduinoUNO
  while(!Serial)continue;
  Serial.print("Connecting to ssid please wait");
  wifiMulti.addAP("Sandy","12345678");
- wifiMulti.addAP("Harshavardhan","12345678");
+ wifiMulti.addAP("MSI","12345678");
  while(wifiMulti.run()!=WL_CONNECTED)
  {
   delay(1000);
@@ -45,8 +52,8 @@ void setup()
   }
   SPIFFS.begin();
   server.onNotFound(handleNotFound);
-  server.on("/", HTTP_GET,handleFileRead); // Call the 'handleFileRoot' function when a client requests URI "/"
-  server.on("/LED", HTTP_POST, handleLED);
+  server.on("/",HTTP_GET,handleFileRead); // Call the 'handleFileRoot' function when a client requests URI "/"
+  server.on("/LED", HTTP_POST,onMotor);
   server.begin();
   Serial.print(WiFi.localIP());
 }
@@ -58,7 +65,11 @@ void loop()
   JsonObject& root=jsonBuffer.parseObject(s);
   if(root == JsonObject::invalid())
     return; 
-  root.prettyPrintTo(Serial); 
+    root.prettyPrintTo(Serial); 
+ if(d.available()>0)
+  {
+    root1.printTo(d);
+  }  
   dhtHumidityValue=root["Humidity"];
   dhtTemperatureValue=root["Temperature"];
   soilMoistureValue=root["soilMoisture"];
@@ -77,10 +88,13 @@ return "text/plain";
 
 void handleFileRead()
 {
-  String path="index";
-  File file = SPIFFS.open(path,"r");
-  size_t sent = server.streamFile(file,"text/html"); // And send it to the client
-  file.close(); // Then close the file again
+  String path="/index.html";
+  if (SPIFFS.exists(path)) { // If the file exists
+ File file = SPIFFS.open(path, "r"); // Open it
+ size_t sent = server.streamFile(file, "text/html"); // And send it to the client
+ file.close(); // Then close the file again
+}
+Serial.println("\tFile Not Found");
 }
 
 void runFan()
@@ -89,12 +103,12 @@ void runPump()
 {}
 
 
-void handleLED()
-{ // If a POST request is made to URI /LED
-  server.send(200, "text/html","<H1>Harsha u hopless fellow</H1>");
-  server.sendHeader("Location","index.html"); // Add a header to respond with a new location for the browser to go to the home page again
-  server.send(303); // Send it back to the browser with an HTTP status 303 (See Other) to redirect
+void onMotor()
+{
+   root1["motorStatus"]=!motorStatus;
+   handleFileRead();
 }
+
 
 
 
