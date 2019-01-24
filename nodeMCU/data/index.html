@@ -3,7 +3,83 @@
 	     <title>AtmegaEvolution</title>
 	</head>
 	<body>
-	    <h1>Hello world</h1>
-		<form action="/LED" method="POST"><input type="submit" value="Toggle motor"></form>
-	</body>
+	    <h1>AtmegaEvolution</h1>
+		<button type="button" onclick="getData1()">Humidity</button>
+	    <button type="button" onclick="getData2()">Temperature</button><BR>
+		<button type="button" onclick="getData3()">Soil moisture</button>
+	    <button type="button" onclick="getData4()">CO2</button><BR>
+		<button type="button" onclick="getData5()">Air quality</button><BR>
+		<div>
+	     Temperature value is : <span id="TempValue">000</span><br>
+         Humidity value is : <span id="HumValue">000</span><br> 
+		 Soil moisture value is : <span id="soilValue">000</span><br>
+		 CO2 value is : <span id="CO2Value">000</span><br>
+		 Air quality value is : <span id="AirValue">000</span><br>
+        </div>
+		<script>
+  
+ 
+function getData2() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("TempValue").innerHTML =
+      this.responseText;
+    }
+  };
+  xhttp.open("GET", "getTemp", true);
+  xhttp.send();
+  
+  
+  function getData1() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("HumValue").innerHTML =
+      this.responseText;
+    }
+  };
+  xhttp.open("GET", "getHum", true);
+  xhttp.send();
+
+function getData3() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("soilValue").innerHTML =
+      this.responseText;
+    }
+  };
+  xhttp.open("GET", "getSoil", true);
+  xhttp.send();
+
+function getData4() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("CO2Value").innerHTML =
+      this.responseText;
+    }
+  };
+  xhttp.open("GET", "getCO2", true);
+  xhttp.send();
+
+function getData5() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("AirValue").innerHTML =
+      this.responseText;
+    }
+  };
+  xhttp.open("GET", "getAir", true);
+  xhttp.send();
+
+}
+</script>
+
+		<form action="/onMotor" method="POST"><input type="submit" value="Toggle motor"></form>
+		<form action="/onFan" method="POST"><input type="submit" value="Toggle Fan"></form>
+		<form action="/plotGraph" method="POST"><input type="submit" value="Generate graph"></form>
+		</body>
 </html>

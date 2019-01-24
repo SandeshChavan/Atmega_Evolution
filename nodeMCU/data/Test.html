@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+
+<head>
+	<title>Grid Lines Display Settings</title>
+	<script src="Chart.js"></script>
+	<script src="utils.js"></script>
+	<style>
+		canvas{
+			-moz-user-select: none;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+		}
+		.chart-container {
+			width: 500px;
+			margin-left: 40px;
+			margin-right: 40px;
+			margin-bottom: 40px;
+		}
+		.container {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+			justify-content: center;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container"></div>
+	<script>
+	      
+	     setInterval(function() {
+             // Call a function repetatively with 2 Second interval
+              getGraph();
+             }, 2000); //2000mSeconds update rate
+         int i=0;
+		 var data["","","","","",""];
+		 function getData() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        data[i]=this.responseText;
+        i++;
+		i=i%5;		
+	  }
+  };
+      xhttp.open("GET", "readValues", true);
+      xhttp.send();
+     }
+ 
+		function createConfig(gridlines, title) {
+			return {
+				type: 'line',
+				data: {
+					labels: ['Humidity'],
+					datasets: [{
+						label: 'My First dataset',
+						backgroundColor: window.chartColors.red,
+						borderColor: window.chartColors.red,
+						data: ['data[0]','data[1]','data[2]','data[3]','data[4]]');
+						fill: false,
+					}]
+				},
+				
+				options: {
+					responsive: true,
+					title: {
+						display: true,
+						text: title
+					},
+					scales: {
+						xAxes: [{
+							gridLines: gridlines
+						}],
+						yAxes: [{
+							gridLines: gridlines,
+							ticks: {
+								min: 0,
+								max: 100,
+								stepSize: 10
+							}
+						}]
+					}
+				}
+			};
+		}
+
+		window.onload = function() {
+			var container = document.querySelector('.container');
+
+			[{
+				title: 'Display: true',
+				gridLines: {
+					display: true
+				}
+			}].forEach(function(details) {
+				var div = document.createElement('div');
+				div.classList.add('chart-container');
+
+				var canvas = document.createElement('canvas');
+				div.appendChild(canvas);
+				container.appendChild(div);
+
+				var ctx = canvas.getContext('2d');
+				var config = createConfig(details.gridLines, details.title);
+				new Chart(ctx, config);
+			});
+		};
+	</script>
+</body>
+
+</html>
